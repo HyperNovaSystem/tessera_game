@@ -1,4 +1,4 @@
-import { defineComponent, type Entity } from 'domecs'
+import { defineComponent, type Entity } from '@domecs/core'
 
 export type PlayerId = 0 | 1 | 2 | 3
 export type GameStatus = 'playing' | 'won' | 'timeout'

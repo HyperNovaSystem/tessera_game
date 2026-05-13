@@ -1,5 +1,5 @@
-import { Has, type Entity } from 'domecs'
-import { defineView, mountDOM } from 'domecs-dom'
+import { Has, type Entity } from '@domecs/core'
+import { defineView, mountDOM } from '@domecs/dom'
 import {
   BoardCell,
   EvalStats,

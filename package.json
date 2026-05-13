@@ -18,8 +18,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "domecs": "file:../domecs/packages/domecs",
-    "domecs-dom": "file:../domecs/packages/domecs-dom"
+    "@domecs/core": "file:../domecs/packages/domecs",
+    "@domecs/dom": "file:../domecs/packages/domecs-dom"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",

@@ -6,7 +6,7 @@ import {
   type Entity,
   type World,
   type WorldSnapshot,
-} from 'domecs'
+} from '@domecs/core'
 import {
   BoardCell,
   EvalStats,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { Has } from 'domecs'
+import { Has } from '@domecs/core'
 import {
   BoardCell,
   EvalStats,
