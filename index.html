@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DOMECS · Tessera</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <p class="eyebrow">DOMECS exemplar #4</p>
+        <h1>Tessera</h1>
+        <p class="dek">A deterministic hex-board strategy game with headless rules, per-move snapshots, undo/redo, replay export, and tournament clocks.</p>
+      </div>
+      <nav class="controls" aria-label="Game controls">
+        <button id="undo">Undo</button>
+        <button id="redo">Redo</button>
+        <button id="pass">Pass</button>
+        <button id="copy-replay">Export replay</button>
+      </nav>
+    </header>
+
+    <main>
+      <aside class="panel">
+        <h2>Players</h2>
+        <div id="players"></div>
+        <div id="status" class="status"></div>
+      </aside>
+
+      <section class="board-wrap" aria-label="Tessera board">
+        <div id="board"></div>
+        <footer id="chrome"></footer>
+      </section>
+
+      <aside class="panel">
+        <h2>Replay / rollback</h2>
+        <textarea id="replay" spellcheck="false" aria-label="Replay JSON"></textarea>
+        <h2>Move log</h2>
+        <ol id="log"></ol>
+        <p class="hint">Click one of your pieces, then an adjacent empty or enemy hex. No animation frame drives the rules; each click emits one command and one DOMECS turn.</p>
+      </aside>
+    </main>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
