@@ -27,7 +27,7 @@ let turnStartedAt = performance.now()
 const cellView = defineView({
   slot: 'board',
   query: Has(BoardCell),
-  changedOn: [BoardCell],
+  changedOn: { mode: 'explicit', types: [BoardCell] },
   create(entity) {
     const el = document.createElement('button')
     el.type = 'button'
@@ -37,12 +37,12 @@ const cellView = defineView({
     return el
   },
   update(el, entity) { paintCell(el, entity.id) },
-})
+});
 
 const pieceView = defineView({
   slot: 'board',
   query: Has(Piece),
-  changedOn: [Piece, Mobility],
+  changedOn: { mode: 'explicit', types: [Piece, Mobility] },
   create(entity) {
     const el = document.createElement('button')
     el.type = 'button'
@@ -55,9 +55,12 @@ const pieceView = defineView({
     return el
   },
   update(el, entity) { paintPiece(el, entity.id) },
-})
+});
 
-mountDOM(refs.world, { slots: { board }, views: [cellView, pieceView] })
+const mountResult = mountDOM(refs.world, { slots: { board }, views: [cellView, pieceView] })
+if (!mountResult.ok) {
+  throw new Error(`Tessera failed to mount DOM: ${mountResult.error.kind}`)
+}
 
 refs.world.signals.tickEnd.subscribe(() => paintHud())
 
@@ -202,7 +205,7 @@ function commandText(command: Parameters<typeof refs.submit>[0]): string {
 }
 
 function escapeHtml(value: unknown): string {
-  return String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c)
+  return String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c);
 }
 
 function must(id: string): HTMLElement {

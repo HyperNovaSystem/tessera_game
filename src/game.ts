@@ -1,5 +1,5 @@
 import {
-  Changed,
+  OnChanged,
   createWorld,
   defineEvent,
   entry,
@@ -95,14 +95,14 @@ export function createTessera(options: TesseraOptions = {}): TesseraRefs {
       playerCount,
       targetScore,
       clockInitialMs,
-      currentPlayer: world.rand.int(playerCount),
+      currentPlayer: world.rand.uniformInt(playerCount),
       clocks: Array.from({ length: playerCount }, () => clockInitialMs),
       scores: Array.from({ length: playerCount }, () => 0),
       moveLog: [],
     })),
     entry(EvalStats, EvalStats.create()),
     entry(Selection, Selection.create()),
-  ])
+  ]);
 
   for (const coord of allCoords(radius)) {
     const homePlayer = homePlayerFor(coord, radius, playerCount)
@@ -145,9 +145,9 @@ export function createTessera(options: TesseraOptions = {}): TesseraRefs {
       const accepted = applyCommand(command)
       if (accepted) pendingHistorySnapshot = true
     }
-  })
+  });
 
-  world.system('headless-ai-eval-delta', { query: Changed(Piece), schedule: 'reactive', reactsTo: Changed(Piece), priority: 20 }, (ctx) => {
+  world.system('headless-ai-eval-delta', { query: OnChanged(Piece), schedule: 'reactive', reactsTo: OnChanged(Piece), priority: 20 }, (ctx) => {
     const stats = world.getComponent(gameId, EvalStats)
     if (!stats) return
     let changed = 0
@@ -161,7 +161,7 @@ export function createTessera(options: TesseraOptions = {}): TesseraRefs {
       stats.lastMobilityTotal = totalMobility()
       world.markChanged(gameId, EvalStats)
     }
-  })
+  });
 
   world.signals.tickEnd.subscribe(() => {
     if (!pendingHistorySnapshot) return
