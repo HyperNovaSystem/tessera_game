@@ -7,6 +7,7 @@ import {
   type World,
   type WorldSnapshot,
 } from '@domecs/core'
+import { createSnapshotHistory, type SnapshotHistory } from '@domecs/persist'
 import {
   BoardCell,
   EvalStats,
@@ -34,15 +35,10 @@ export interface TesseraRefs {
   gameId: Entity
   cellIds: readonly Entity[]
   pieceIds: readonly Entity[]
-  history: TesseraHistory
+  history: SnapshotHistory
   submit(command: TesseraCommand): boolean
   undo(): boolean
   redo(): boolean
-}
-
-export interface TesseraHistory {
-  snapshots: WorldSnapshot[]
-  cursor: number
 }
 
 export interface LegalMove {
@@ -85,7 +81,6 @@ export function createTessera(options: TesseraOptions = {}): TesseraRefs {
   const cellIds: Entity[] = []
   const pieceIds: Entity[] = []
   const cellByKey = new Map<string, Entity>()
-  const history: TesseraHistory = { snapshots: [], cursor: 0 }
   let pendingHistorySnapshot = false
 
   const gameId = world.spawn([
@@ -140,6 +135,9 @@ export function createTessera(options: TesseraOptions = {}): TesseraRefs {
 
   refreshAllMobility()
 
+  // captureInitial (default true) records the post-setup baseline that undo() returns to.
+  const history = createSnapshotHistory(world, { limit: 4096 })
+
   world.system('tessera-command-resolution', { schedule: 'event', triggers: [CommandEvent], priority: 10 }, (ctx) => {
     for (const command of ctx.events.of(CommandEvent)) {
       const accepted = applyCommand(command)
@@ -166,10 +164,8 @@ export function createTessera(options: TesseraOptions = {}): TesseraRefs {
   world.signals.tickEnd.subscribe(() => {
     if (!pendingHistorySnapshot) return
     pendingHistorySnapshot = false
-    recordSnapshot()
+    history.push()
   })
-
-  recordSnapshot()
 
   const refs: TesseraRefs = {
     world,
@@ -178,8 +174,8 @@ export function createTessera(options: TesseraOptions = {}): TesseraRefs {
     pieceIds,
     history,
     submit(command) { return submitCommand(refs, command) },
-    undo() { return restoreAt(history.cursor - 1) },
-    redo() { return restoreAt(history.cursor + 1) },
+    undo() { return history.undo() },
+    redo() { return history.redo() },
   }
 
   function applyCommand(command: TesseraCommand): boolean {
@@ -418,21 +414,6 @@ export function createTessera(options: TesseraOptions = {}): TesseraRefs {
 
   function findCellIdInMap(q: number, r: number): Entity | null {
     return cellByKey.get(key(q, r)) ?? null
-  }
-
-  function recordSnapshot(): void {
-    if (history.cursor < history.snapshots.length - 1) history.snapshots.splice(history.cursor + 1)
-    history.snapshots.push(world.snapshot())
-    history.cursor = history.snapshots.length - 1
-  }
-
-  function restoreAt(index: number): boolean {
-    if (index < 0 || index >= history.snapshots.length) return false
-    const snapshot = history.snapshots[index]
-    if (!snapshot) return false
-    world.restore(snapshot)
-    history.cursor = index
-    return true
   }
 
   return refs

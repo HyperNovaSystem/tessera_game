@@ -64,7 +64,10 @@ if (!mountResult.ok) {
 
 refs.world.signals.tickEnd.subscribe(() => paintHud())
 
-must('undo').addEventListener('click', () => {
+const undoButton = must('undo') as HTMLButtonElement
+const redoButton = must('redo') as HTMLButtonElement
+
+undoButton.addEventListener('click', () => {
   if (refs.undo()) {
     selectedPieceId = null
     turnStartedAt = performance.now()
@@ -73,7 +76,7 @@ must('undo').addEventListener('click', () => {
   }
 })
 
-must('redo').addEventListener('click', () => {
+redoButton.addEventListener('click', () => {
   if (refs.redo()) {
     selectedPieceId = null
     turnStartedAt = performance.now()
@@ -157,6 +160,8 @@ function paintPiece(el: HTMLElement, id: Entity): void {
 
 function paintHud(): void {
   updateSelectionClasses()
+  undoButton.disabled = !refs.history.canUndo()
+  redoButton.disabled = !refs.history.canRedo()
   const game = refs.world.getComponent(refs.gameId, GameState)
   const stats = refs.world.getComponent(refs.gameId, EvalStats)
   if (!game || !stats) return
@@ -172,7 +177,7 @@ function paintHud(): void {
     : `<strong>Game over</strong><br>${game.status}: Player ${(game.winnerId ?? 0) + 1} wins`
   logEl.innerHTML = game.moveLog.slice(-12).map((record) => `<li><b>P${record.player + 1}</b> ${escapeHtml(record.note)} <code>${escapeHtml(commandText(record.command))}</code></li>`).join('')
   replayEl.value = JSON.stringify(exportReplay(refs), null, 2)
-  chromeEl.textContent = `tick ${refs.world.time.tick} · history ${refs.history.cursor + 1}/${refs.history.snapshots.length} · changed pieces ${stats.changedPieceUpdates} · hash ${snapshotHash(refs.world.snapshot()).length} bytes`
+  chromeEl.textContent = `tick ${refs.world.time.tick} · history ${refs.history.index + 1}/${refs.history.length} · changed pieces ${stats.changedPieceUpdates} · hash ${snapshotHash(refs.world.snapshot()).length} bytes`
 }
 
 function updateSelectionClasses(): void {

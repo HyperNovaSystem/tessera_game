@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "@domecs/core": "file:../domecs/packages/domecs",
-    "@domecs/dom": "file:../domecs/packages/domecs-dom"
+    "@domecs/dom": "file:../domecs/packages/domecs-dom",
+    "@domecs/persist": "file:../domecs/packages/domecs-persist"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",

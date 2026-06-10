@@ -44,12 +44,12 @@ describe('Tessera exemplar', () => {
     const after = refs.world.getComponent(refs.gameId, GameState)!
     expect(after.turn).toBe(beforeTurn + 1)
     expect(after.moveLog).toHaveLength(1)
-    expect(refs.history.snapshots).toHaveLength(2)
+    expect(refs.history.length).toBe(2)
     expect(after.clocks[movingPlayer]).toBe(4 * 60_000 - 750)
 
     const rejected = submitCommand(refs, { kind: 'move', pieceId, to: { q: 99, r: 99 }, spentMs: 1 })
     expect(rejected).toBe(false)
-    expect(refs.history.snapshots).toHaveLength(2)
+    expect(refs.history.length).toBe(2)
   })
 
   it('undo and redo navigate hermetic snapshots', () => {
